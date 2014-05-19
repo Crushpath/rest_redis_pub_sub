@@ -15,9 +15,29 @@ Subscribe to channels using the env var:
 ENV['RRPS_SUBSCRIBE_TO'] = "channel-one,channel-two"
 ```
 
-Publish to default channel:
+Publish to a default channel:
 ```ruby
 ENV['RRPS_PUBLISH_TO'] = 'channel'
+```
+
+For configuring defaults you have to define/load:
+
+```ruby
+RestRedisPubSub.configure do |config|
+  # Defaults to ENV['RRPS_SUBSCRIBE_TO']
+  config.subscribe_to = ['channel-one', 'channel-two']
+
+  # Defaults to ENV['RRPS_PUBLISH_TO']
+  config.publish_to = 'other-channel'
+
+  # Set you preferable redis client to handle subscribe and publish.
+  config.redis_instance = $redis_instance
+end
+```
+
+## Running Listener
+```bash
+bundle exec run rake rest_redis_pub_sub::subscribe
 ```
 
 ## Publish
@@ -83,14 +103,14 @@ class SpotCreated
 end
 ```
 
-## Respond to request
+## Respond to the Request
 
 Base on the status of the class, `RestRedisPubSub` can send a __success__ or __fail__ response,
 along with the identifier.
 
 ```ruby
 RestRedisPubSub::Client.success(verb, resource, identifier, response_data)
-```
+```-
 
 ```json
 => {
@@ -103,12 +123,13 @@ RestRedisPubSub::Client.success(verb, resource, identifier, response_data)
 }
 ```
 
-## Handling response
+## Handling response / Callbacks
 
 ```ruby
 class SpotCreatedPublisher
 
   def publish
+    RestRedisPubSub::Client.post(resource, identifier, data)
   end
 
   def on_success(data)
@@ -118,9 +139,4 @@ class SpotCreatedPublisher
   end
 
 end
-```
-
-## Running Listener
-```bash
-bundle exec run rake rest_redis_pub_sub::subscribe
 ```
