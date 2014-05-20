@@ -4,7 +4,7 @@ module RestRedisPubSub
       block.call(self)
     end
 
-    attr_accessor :subscribe_to, :publish_to, :generator,
+    attr_accessor :subscribe_to, :publish_to, :publisher,
                   :listeners_namespace, :redis_instance
   end
 
