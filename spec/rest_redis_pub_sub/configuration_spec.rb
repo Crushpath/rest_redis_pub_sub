@@ -37,6 +37,14 @@ describe RestRedisPubSub::Configuration do
 
       expect(RestRedisPubSub.redis_instance).to eq(redis_instance)
     end
+
+    it "allows to set an app generator identifier" do
+      RestRedisPubSub.configure do |config|
+        config.generator = 'my-app'
+      end
+
+      expect(RestRedisPubSub.generator).to eq('my-app')
+    end
   end
 
 end
