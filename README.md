@@ -17,7 +17,7 @@ ENV['RRPS_SUBSCRIBE_TO'] = 'my-app-channel'
 
 Publish to a default channel:
 ```ruby
-ENV['RRPS_PUBLISH_TO'] = 'interested-channels'
+ENV['RRPS_PUBLISH_TO'] = 'interested-channel'
 ```
 
 For configuring defaults you have to define/load:
@@ -27,8 +27,9 @@ RestRedisPubSub.configure do |config|
   # Defaults to ENV['RRPS_SUBSCRIBE_TO']
   config.subscribe_to = ['my-app-channel']
 
-  # Defaults to ENV['RRPS_PUBLISH_TO']
-  config.publish_to = 'interested-channels'
+  # Defaults to ENV['RRPS_PUBLISH_TO'] if set,
+  # otherwise it will use #{publisher}.#{resource}
+  config.publish_to = 'interested-channel'
 
   # Set you preferable redis client to handle subscribe and publish.
   config.redis_instance = $redis_instance
@@ -41,7 +42,15 @@ RestRedisPubSub.configure do |config|
 end
 ```
 
-## Running Listener
+## Running the worker
+
+Include `rest_redis_pub_sub/tasks` in you application:
+```
+require 'rest_redis_pub_sub/tasks'
+```
+
+Run the worker:
+
 ```bash
 bundle exec run rake rest_redis_pub_sub:subscribe
 ```
