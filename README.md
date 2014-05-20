@@ -9,26 +9,14 @@ gem 'rest_redis_pub_sub'
 
 ## Configuration
 
-Subscribe to channels using the env var:
-
-```ruby
-ENV['RRPS_SUBSCRIBE_TO'] = 'my-app-channel'
-```
-
-Publish to a default channel:
-```ruby
-ENV['RRPS_PUBLISH_TO'] = 'interested-channel'
-```
-
 For configuring defaults you have to define/load:
 
 ```ruby
 RestRedisPubSub.configure do |config|
-  # Defaults to ENV['RRPS_SUBSCRIBE_TO']
+
   config.subscribe_to = ['my-app-channel']
 
-  # Defaults to ENV['RRPS_PUBLISH_TO'] if set,
-  # otherwise it will use #{publisher}.#{resource}
+  # It defaults to #{publisher}.#{resource}
   config.publish_to = 'interested-channel'
 
   # Set you preferable redis client to handle subscribe and publish.
