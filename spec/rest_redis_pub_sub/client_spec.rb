@@ -14,7 +14,7 @@ describe RestRedisPubSub::Client do
     }
   end
 
-  describe ".created" do
+  describe "#created" do
     it "publish a created event for the given resource" do
       @expected_data[:event] = :created
       json_message = @expected_data.to_json
@@ -25,8 +25,8 @@ describe RestRedisPubSub::Client do
     end
   end
 
-  describe ".updated" do
-    it "publish a updated event for the given resource" do
+  describe "#updated" do
+    it "publish an updated event for the given resource" do
       @expected_data[:event] = :updated
       json_message = @expected_data.to_json
       expect(@redis_instance).to receive(:publish).with('my-app-resource', json_message)
@@ -36,7 +36,7 @@ describe RestRedisPubSub::Client do
     end
   end
 
-  describe ".deleted" do
+  describe "#deleted" do
     it "publish a deleted event for the given resource" do
       @expected_data[:event] = :deleted
       json_message = @expected_data.to_json
@@ -46,5 +46,7 @@ describe RestRedisPubSub::Client do
       client.deleted('resource', 'resource-id', {name: 'resource-name'})
     end
   end
+
+  describe "#channel"
 
 end
