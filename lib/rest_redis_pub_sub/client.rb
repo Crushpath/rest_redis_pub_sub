@@ -3,17 +3,21 @@ require 'json'
 module RestRedisPubSub
   class Client
 
-    def initialize(channels=nil)
-      @channels = channels
+    def initialize(channel=nil)
+      @channel = channel
     end
-
-    attr_reader :channels
 
     [:created, :updated, :deleted].each do |method|
       define_method(method) do |resource, identifier, data={}|
         publish(method, resource, identifier, data)
       end
     end
+
+    def channel(resource)
+      @channel || RestRedisPubSub.publish_to || "#{RestRedisPubSub.publisher}.#{resource}"
+    end
+
+    private
 
     def publish(event, resource, identifier, data={})
       json_object = {
@@ -24,7 +28,10 @@ module RestRedisPubSub
         data: data
       }.to_json
 
-      RestRedisPubSub.redis_instance.publish(channels, json_object)
+      RestRedisPubSub.redis_instance.publish(
+        channel(resource),
+        json_object
+      )
     end
 
   end

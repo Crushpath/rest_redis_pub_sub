@@ -3,6 +3,7 @@ require 'spec_helper'
 describe RestRedisPubSub::Client do
   before do
     @redis_instance = double('redis_instance')
+    RestRedisPubSub.reset!
     RestRedisPubSub.redis_instance = @redis_instance
     RestRedisPubSub.publisher = 'my-app'
     @expected_data = {
@@ -47,6 +48,23 @@ describe RestRedisPubSub::Client do
     end
   end
 
-  describe "#channel"
+  describe "#channel" do
+    it "prioritize custom channel" do
+      client = RestRedisPubSub::Client.new('my-custom-channel')
+      expect(client.channel('resource')).to eq('my-custom-channel')
+    end
+
+    it "should take configured channel is no custom one is provided" do
+      RestRedisPubSub.publish_to = 'default-channel'
+      client = RestRedisPubSub::Client.new
+      expect(client.channel('resource')).to eq('default-channel')
+    end
+
+    it "should default to publisher + resource" do
+      RestRedisPubSub.publisher = 'my-app'
+      client = RestRedisPubSub::Client.new
+      expect(client.channel('resource')).to eq('my-app.resource')
+    end
+  end
 
 end
