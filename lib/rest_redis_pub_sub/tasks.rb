@@ -1,3 +1,5 @@
+require 'rest_redis_pub_sub'
+
 namespace :rest_redis_pub_sub do
   task :setup
 
@@ -5,18 +7,24 @@ namespace :rest_redis_pub_sub do
   task :subscribe => [:preload, :setup] do
     subscribed_channels = RestRedisPubSub.subscribe_to
 
-    RestRedisPubSub.redis_instance.subscribe(subscribed_channels) do |on|
-      on.subscribe do |channel, subscriptions|
-        puts "Subscribed to ##{channel} (#{subscriptions} subscriptions)"
-      end
+    begin
+      RestRedisPubSub.redis_instance.subscribe(subscribed_channels) do |on|
+        on.subscribe do |channel, subscriptions|
+          puts "Subscribed to ##{channel} (#{subscriptions} subscriptions)"
+        end
 
-      on.message do |channel, message|
-        puts "##{channel}: #{message}"
-      end
+        on.message do |channel, message|
+          puts "##{channel}: #{message}"
+        end
 
-      on.unsubscribe do |channel, subscriptions|
-        puts "Unsubscribed from ##{channel} (#{subscriptions} subscriptions)"
+        on.unsubscribe do |channel, subscriptions|
+          puts "Unsubscribed from ##{channel} (#{subscriptions} subscriptions)"
+        end
       end
+    rescue Redis::BaseConnectionError => error
+      puts "#{error}, retrying in 1s"
+      sleep 1
+      retry
     end
   end
 
