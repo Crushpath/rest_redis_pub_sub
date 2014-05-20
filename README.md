@@ -1,6 +1,9 @@
 RestRedisPubSub
 ===============
 
+RestRedisPubSub is a small library for publishing, subscribing and handling messages
+via Redis pub/sub. It use conventions to simplify configuration.
+
 ## Installation
 
 ```ruby
