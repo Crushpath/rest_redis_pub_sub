@@ -7,6 +7,12 @@ module RestRedisPubSub
 
     attr_reader :channels
 
+    [:created, :updated, :deleted].each do |method|
+      define_method(method) do |resource, identifier, data={}|
+        publish(method, resource, identifier, data)
+      end
+    end
+
     def publish(event, resource, identifier, data={})
       json_object = {
         publisher: RestRedisPubSub.publisher,
