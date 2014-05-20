@@ -47,4 +47,25 @@ describe RestRedisPubSub::Configuration do
     end
   end
 
+  describe ".reset!" do
+    it "reset the configuratin values" do
+      Listeners = Class.new
+      MyRedis = Class.new
+      redis_instance = MyRedis.new
+      RestRedisPubSub.configure do |config|
+        config.subscribe_to = ["subscribed-channel"]
+        config.publish_to = "my-publish-channel"
+        config.redis_instance = redis_instance
+        config.listeners_namespace = Listeners
+      end
+
+      RestRedisPubSub.reset!
+
+      expect(RestRedisPubSub.subscribe_to).to be_nil
+      expect(RestRedisPubSub.publish_to).to be_nil
+      expect(RestRedisPubSub.redis_instance).to be_nil
+      expect(RestRedisPubSub.listeners_namespace).to be_nil
+    end
+  end
+
 end
