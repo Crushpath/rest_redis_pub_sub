@@ -1,7 +1,8 @@
 module RestRedisPubSub
   module Helper
 
-    def self.camelize(string)
+    def self.camelize(term)
+      string = term.to_s
       string = string.sub(/^[a-z\d]*/) { $&.capitalize }
       string.gsub!(/(?:_|(\/))([a-z\d]*)/i) { "#{$1}#{$2.capitalize}" }
       string

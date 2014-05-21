@@ -15,6 +15,7 @@ namespace :rest_redis_pub_sub do
 
         on.message do |channel, message|
           puts "##{channel}: #{message}"
+          RestRedisPubSub::EventHandler.handle(message)
         end
 
         on.unsubscribe do |channel, subscriptions|
