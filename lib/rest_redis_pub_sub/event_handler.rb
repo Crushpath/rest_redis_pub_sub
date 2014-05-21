@@ -21,7 +21,7 @@ module RestRedisPubSub
 
     def forward
       return if class_to_forward.nil?
-      class_to_forward.new(identifier, data).perform
+      class_to_forward.perform(identifier, data)
     end
 
     def class_to_forward
