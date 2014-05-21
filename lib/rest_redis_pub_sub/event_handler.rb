@@ -21,7 +21,7 @@ module RestRedisPubSub
 
     def forward
       return if class_to_forward.nil?
-      class_to_forward.new(identifier, data).perform
+      class_to_forward.perform(identifier, data)
     end
 
     def class_to_forward
@@ -31,7 +31,7 @@ module RestRedisPubSub
       if namespace = RestRedisPubSub.listeners_namespace
         class_name_parts.unshift(namespace, '::')
       end
-      class_name = class_name_parts.map { Helper.camelize(part) }.join
+      class_name = class_name_parts.map {|part| Helper.camelize(part) }.join
       Helper.constantize_if_defined(class_name)
     end
 
