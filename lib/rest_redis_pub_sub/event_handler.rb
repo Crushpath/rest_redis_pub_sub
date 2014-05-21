@@ -21,7 +21,12 @@ module RestRedisPubSub
 
     def forward
       return if class_to_forward.nil?
-      class_to_forward.perform(identifier, data)
+
+      if enqueue_forward?
+        forward_in_background
+      else
+        class_to_forward.perform(identifier, data)
+      end
     end
 
     def class_to_forward
@@ -33,6 +38,14 @@ module RestRedisPubSub
       end
       class_name = class_name_parts.map {|part| Helper.camelize(part) }.join
       Helper.constantize_if_defined(class_name)
+    end
+
+    def enqueue_forward?
+      defined?(Resque)
+    end
+
+    def forward_in_background
+      Resque.enqueue(class_to_forward, identifier, data)
     end
 
   end
