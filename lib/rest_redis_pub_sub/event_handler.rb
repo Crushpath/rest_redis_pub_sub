@@ -10,11 +10,11 @@ module RestRedisPubSub
     end
 
     def initialize(options={})
-      @event = options[:event]
-      @resource = options[:resource]
-      @publisher = options[:publisher]
-      @identifier = options[:id]
-      @data = options[:data]
+      @event = options['event']
+      @resource = options['resource']
+      @publisher = options['publisher']
+      @identifier = options['id']
+      @data = options['data']
     end
 
     attr_reader :event, :resource, :publisher, :identifier, :data
@@ -27,12 +27,14 @@ module RestRedisPubSub
     def class_to_forward
       return unless resource && event
 
-      class_name_parts = [resource, event]
-      if namespace = RestRedisPubSub.listeners_namespace
-        class_name_parts.unshift(namespace, '::')
+      @class_to_forward ||= begin
+        class_name_parts = [resource, event]
+        if namespace = RestRedisPubSub.listeners_namespace
+          class_name_parts.unshift(namespace, '::')
+        end
+        class_name = class_name_parts.map {|part| Helper.camelize(part) }.join
+        Helper.constantize_if_defined(class_name)
       end
-      class_name = class_name_parts.map {|part| Helper.camelize(part) }.join
-      Helper.constantize_if_defined(class_name)
     end
 
   end
