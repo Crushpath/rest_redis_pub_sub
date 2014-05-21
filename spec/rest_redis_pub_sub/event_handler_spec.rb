@@ -3,12 +3,23 @@ require 'spec_helper'
 describe RestRedisPubSub::EventHandler do
 
   describe "#forward" do
+    before do
+      @forwarded_class = double('ResourceEvent')
+    end
+
     it "should call #perform on class to forward" do
       handler = RestRedisPubSub::EventHandler.new
-      forwarded_class = double('ResourceEvent')
-      handler.stub(:class_to_forward).and_return(forwarded_class)
-      forwarded_class.should_receive(:perform)
+      handler.stub(:class_to_forward).and_return(@forwarded_class)
+      @forwarded_class.should_receive(:perform)
 
+      handler.forward
+    end
+
+    it "should enqueue it if background class is defined" do
+      handler = RestRedisPubSub::EventHandler.new
+      handler.stub(:class_to_forward).and_return(@forwarded_class)
+      handler.stub(:enqueue_forward?).and_return(true)
+      handler.should_receive(:forward_in_background)
       handler.forward
     end
   end
