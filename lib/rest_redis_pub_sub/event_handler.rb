@@ -31,7 +31,7 @@ module RestRedisPubSub
       if namespace = RestRedisPubSub.listeners_namespace
         class_name_parts.unshift(namespace, '::')
       end
-      class_name = class_name_parts.map { Helper.camelize(part) }.join
+      class_name = class_name_parts.map {|part| Helper.camelize(part) }.join
       Helper.constantize_if_defined(class_name)
     end
 

@@ -2,6 +2,17 @@ require 'spec_helper'
 
 describe RestRedisPubSub::EventHandler do
 
+  describe "#forward" do
+    it "should call #perform on class to forward" do
+      handler = RestRedisPubSub::EventHandler.new
+      forwarded_class = double('ResourceEvent')
+      handler.stub(:class_to_forward).and_return(forwarded_class)
+      forwarded_class.should_receive(:perform)
+
+      handler.forward
+    end
+  end
+
   describe "#class_to_forward" do
     it "should retrieve the proper class if exists" do
       ProductCreated = Class.new
