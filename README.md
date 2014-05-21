@@ -81,12 +81,16 @@ __event__ and __resource__ received:
 | updated | product  | ProductUpdated |
 | delated | user     | UserDeleted    |
 
+The class must implement a class method `.perform`. If `Resque` is defined it will
+enqueue it.
+
 An example class that should be defined in the project to handle the publish message:
 
 ```ruby
 class SpotCreated
 
-  def initialize(id, data)
+  def self.perform(id, data)
+    ...
   end
 
 end
