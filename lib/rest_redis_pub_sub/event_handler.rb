@@ -7,6 +7,8 @@ module RestRedisPubSub
       message = JSON.parse(raw_message)
       @handler = self.new(message)
       @handler.forward
+    rescue JSON::ParserError
+      puts 'Invalid message received'
     end
 
     def initialize(options={})
