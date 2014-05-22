@@ -50,12 +50,12 @@ bundle exec run rake rest_redis_pub_sub:subscribe
 
 Using default channel:
 ```ruby
-RestRedisPubSub::Client.publish(created, resource, identifier, data)
+RestRedisPubSub::Client.publish_create(resource, identifier, data)
 ```
 Or a custom one:
 ```ruby
 client = RestRedisPubSub::Client.new('channel')
-client.publish(created, resource, identifier, data)
+client.publish_create(resource, identifier, data)
 ```
 
 It publish to the specified channel the following data in json format:
@@ -70,16 +70,23 @@ It publish to the specified channel the following data in json format:
 }
 ```
 
+Available publish events:
+* `publish_request`
+* `publish_create`
+* `publish_update`
+* `publish_delete`
+
 ## Subscribe
 
 `RestRedisPubSub` will forward all messages received to a class base on the
-__event__ and __resource__ received:
+__publisher__, __event__ and __resource__ received:
 
-| Event   | Resource | Class          |
-|---------|----------|----------------|
-| created | spot     | SpotCreated    |
-| updated | product  | ProductUpdated |
-| delated | user     | UserDeleted    |
+| Event     | Resource | Class                   |
+|-----------|----------|-------------------------|
+| requested | spot     | PublisherSpotRequested  |
+| created   | spot     | PublisherSpotCreated    |
+| updated   | product  | PublisherProductUpdated |
+| deleted   | user     | PublisherUserDeleted    |
 
 The class must implement a class method `.perform`. If `Resque` is defined it will
 enqueue it.
@@ -87,7 +94,7 @@ enqueue it.
 An example class that should be defined in the project to handle the publish message:
 
 ```ruby
-class SpotCreated
+class CrushpathSpotCreated
 
   def self.perform(id, data)
     ...
