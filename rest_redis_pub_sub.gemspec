@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = RestRedisPubSub::VERSION
   spec.authors       = ["Crushpath"]
   spec.email         = ["support@crushpath.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
-  spec.homepage      = ""
+  spec.summary   = %q{RestRedisPubSub is a small library for publishing, subscribing and handling messages via Redis pub/sub.}
+  spec.description   = spec.summary
+  spec.homepage      = "http://crushpath.com"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
