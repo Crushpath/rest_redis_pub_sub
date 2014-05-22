@@ -32,10 +32,10 @@ module RestRedisPubSub
     end
 
     def class_to_forward
-      return unless resource && event
+      return unless publisher && resource && event
 
       @class_to_forward ||= begin
-        class_name_parts = [resource, event]
+        class_name_parts = [publisher, resource, event]
         if namespace = RestRedisPubSub.listeners_namespace
           class_name_parts.unshift(namespace, '::')
         end
