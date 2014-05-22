@@ -15,36 +15,47 @@ describe RestRedisPubSub::Client do
     }
   end
 
-  describe "#created" do
+  describe "#request" do
+    it "publish a requested event for the given resource" do
+      @expected_data[:event] = :requested
+      json_message = @expected_data.to_json
+      expect(@redis_instance).to receive(:publish).with('my-app-resource', json_message)
+
+      client = RestRedisPubSub::Client.new('my-app-resource')
+      client.publish_request('resource', 'resource-id', {name: 'resource-name'})
+    end
+  end
+
+  describe "#create" do
     it "publish a created event for the given resource" do
       @expected_data[:event] = :created
       json_message = @expected_data.to_json
       expect(@redis_instance).to receive(:publish).with('my-app-resource', json_message)
 
       client = RestRedisPubSub::Client.new('my-app-resource')
-      client.created('resource', 'resource-id', {name: 'resource-name'})
+      client.publish_create('resource', 'resource-id', {name: 'resource-name'})
     end
   end
 
-  describe "#updated" do
+  describe "#update" do
     it "publish an updated event for the given resource" do
       @expected_data[:event] = :updated
       json_message = @expected_data.to_json
       expect(@redis_instance).to receive(:publish).with('my-app-resource', json_message)
 
       client = RestRedisPubSub::Client.new('my-app-resource')
-      client.updated('resource', 'resource-id', {name: 'resource-name'})
+      client.publish_update('resource', 'resource-id', {name: 'resource-name'})
     end
   end
 
-  describe "#deleted" do
+  describe "#delete" do
     it "publish a deleted event for the given resource" do
       @expected_data[:event] = :deleted
       json_message = @expected_data.to_json
       expect(@redis_instance).to receive(:publish).with('my-app-resource', json_message)
 
       client = RestRedisPubSub::Client.new('my-app-resource')
-      client.deleted('resource', 'resource-id', {name: 'resource-name'})
+      client.publish_delete('resource', 'resource-id', {name: 'resource-name'})
     end
   end
 

@@ -2,13 +2,19 @@ require 'json'
 
 module RestRedisPubSub
   class Client
+    EVENT_MAPPER = {
+      :request => :requested,
+      :create => :created,
+      :update => :updated,
+      :delete => :deleted
+    }
 
     def initialize(channel=nil)
       @channel = channel
     end
 
-    [:created, :updated, :deleted].each do |method|
-      define_method(method) do |resource, identifier, data={}|
+    [:create, :update, :delete, :request].each do |method|
+      define_method("publish_#{method}".to_sym) do |resource, identifier, data={}|
         publish(method, resource, identifier, data)
       end
     end
@@ -22,7 +28,7 @@ module RestRedisPubSub
     def publish(event, resource, identifier, data={})
       json_object = {
         publisher: RestRedisPubSub.publisher,
-        event: event,
+        event: EVENT_MAPPER[event],
         resource: resource,
         id: identifier,
         data: data
