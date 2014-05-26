@@ -2,42 +2,83 @@ require 'json'
 
 module RestRedisPubSub
   class Client
-    EVENT_MAPPER = {
-      :request => :requested,
-      :create => :created,
-      :update => :updated,
-      :delete => :deleted
-    }
+
+    def self.define_publish_methods
+      RestRedisPubSub.verbs.each do |verb|
+        define_method("publish_#{verb}".to_sym) do |options={}|
+          @options = options.merge(verb: verb)
+          publish
+        end
+      end
+    end
 
     def initialize(channel=nil)
       @channel = channel
     end
+    attr_reader :options
 
-    [:create, :update, :delete, :request].each do |method|
-      define_method("publish_#{method}".to_sym) do |resource, identifier, data={}|
-        publish(method, resource, identifier, data)
-      end
-    end
-
-    def channel(resource)
-      @channel || RestRedisPubSub.publish_to || "#{RestRedisPubSub.publisher}.#{resource}"
+    def channel
+      @channel || RestRedisPubSub.publish_to || "#{RestRedisPubSub.generator}.#{resource}"
     end
 
     private
 
-    def publish(event, resource, identifier, data={})
+    def publish(options={})
       json_object = {
-        publisher: RestRedisPubSub.publisher,
-        event: EVENT_MAPPER[event],
-        resource: resource,
-        id: identifier,
-        data: data
+        generator: generator,
+        provider: provider,
+        verb: verb,
+        actor: actor,
+        object: object,
+        target: target,
+        id: id,
+        activity_type: activity_type
       }.to_json
 
       RestRedisPubSub.redis_instance.publish(
-        channel(resource),
+        channel,
         json_object
       )
+    end
+
+    def generator
+      { display_name: RestRedisPubSub.generator }
+    end
+
+    def provider
+      { display_name: RestRedisPubSub.provider }
+    end
+
+    def actor
+      options.fetch(:actor)
+    end
+
+    def object
+      options.fetch(:object)
+    end
+
+    def verb
+      options.fetch(:verb, :post)
+    end
+
+    def id
+      options.fetch(:id, nil)
+    end
+
+    def target
+      options.fetch(:target, nil)
+    end
+
+    def published
+      options.fetch(:published, Time.now)
+    end
+
+    def resource
+      object.fetch(:object_type)
+    end
+
+    def activity_type
+      [resource, verb].join('_')
     end
 
   end

@@ -4,77 +4,56 @@ describe RestRedisPubSub::Client do
   before do
     @redis_instance = double('redis_instance')
     RestRedisPubSub.reset!
-    RestRedisPubSub.redis_instance = @redis_instance
-    RestRedisPubSub.publisher = 'my-app'
+    RestRedisPubSub.configure do |config|
+      config.generator = 'my-app'
+      config.redis_instance = @redis_instance
+      config.verbs = [:create]
+    end
     @expected_data = {
-      publisher: RestRedisPubSub.publisher,
-      event: nil,
-      resource: 'resource',
-      id: 'resource-id',
-      data: {name: 'resource-name'}
+      generator: {display_name: RestRedisPubSub.generator},
+      provider: {display_name: "rest_redis_pub_sub #{RestRedisPubSub::VERSION}"},
+      verb: nil,
+      actor: {display_name: :system},
+      object: {object_type: 'resource', display_name: 'resource-name'},
+      target: nil,
+      id: nil,
+      activity_type: nil,
+    }
+    @input_data = {
+      actor: {display_name: :system},
+      object: {object_type: 'resource', display_name: 'resource-name'}
     }
   end
 
-  describe "#request" do
-    it "publish a requested event for the given resource" do
-      @expected_data[:event] = :requested
-      json_message = @expected_data.to_json
-      expect(@redis_instance).to receive(:publish).with('my-app-resource', json_message)
-
-      client = RestRedisPubSub::Client.new('my-app-resource')
-      client.publish_request('resource', 'resource-id', {name: 'resource-name'})
-    end
-  end
-
   describe "#create" do
-    it "publish a created event for the given resource" do
-      @expected_data[:event] = :created
+    it "publish a create event for the given resource" do
+      @expected_data[:verb] = :create
+      @expected_data[:activity_type] = :resource_create
       json_message = @expected_data.to_json
       expect(@redis_instance).to receive(:publish).with('my-app-resource', json_message)
 
       client = RestRedisPubSub::Client.new('my-app-resource')
-      client.publish_create('resource', 'resource-id', {name: 'resource-name'})
-    end
-  end
-
-  describe "#update" do
-    it "publish an updated event for the given resource" do
-      @expected_data[:event] = :updated
-      json_message = @expected_data.to_json
-      expect(@redis_instance).to receive(:publish).with('my-app-resource', json_message)
-
-      client = RestRedisPubSub::Client.new('my-app-resource')
-      client.publish_update('resource', 'resource-id', {name: 'resource-name'})
-    end
-  end
-
-  describe "#delete" do
-    it "publish a deleted event for the given resource" do
-      @expected_data[:event] = :deleted
-      json_message = @expected_data.to_json
-      expect(@redis_instance).to receive(:publish).with('my-app-resource', json_message)
-
-      client = RestRedisPubSub::Client.new('my-app-resource')
-      client.publish_delete('resource', 'resource-id', {name: 'resource-name'})
+      client.publish_create(@input_data)
     end
   end
 
   describe "#channel" do
     it "prioritize custom channel" do
       client = RestRedisPubSub::Client.new('my-custom-channel')
-      expect(client.channel('resource')).to eq('my-custom-channel')
+      expect(client.channel).to eq('my-custom-channel')
     end
 
     it "should take configured channel is no custom one is provided" do
       RestRedisPubSub.publish_to = 'default-channel'
       client = RestRedisPubSub::Client.new
-      expect(client.channel('resource')).to eq('default-channel')
+      expect(client.channel).to eq('default-channel')
     end
 
     it "should default to publisher + resource" do
-      RestRedisPubSub.publisher = 'my-app'
+      RestRedisPubSub.generator = 'my-app'
       client = RestRedisPubSub::Client.new
-      expect(client.channel('resource')).to eq('my-app.resource')
+      client.instance_variable_set(:@options, @input_data)
+      expect(client.channel).to eq('my-app.resource')
     end
   end
 

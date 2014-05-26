@@ -19,7 +19,7 @@ RestRedisPubSub.configure do |config|
 
   config.subscribe_to = ['my-app-channel']
 
-  # It defaults to #{publisher}.#{resource}
+  # It defaults to #{generator}.#{resource}
   config.publish_to = 'interested-channel'
 
   # Set you preferable redis client to handle subscribe and publish.
@@ -29,7 +29,7 @@ RestRedisPubSub.configure do |config|
   config.listeners_namespace = MyListeners::Namespace
 
   # Set publish generator
-  config.publisher = 'my-app'
+  config.generator = 'my-app'
 end
 ```
 
@@ -62,7 +62,9 @@ It publish to the specified channel the following data in json format:
 
 ```json
 => {
-  publisher: 'my-app'
+  generator: {
+    application: 'my-app'
+  }
   event: 'created',
   resource: 'spot',
   id: 'spot_id',
@@ -79,7 +81,7 @@ Available publish events:
 ## Subscribe
 
 `RestRedisPubSub` will forward all messages received to a class base on the
-__publisher__, __event__ and __resource__ received:
+__generator__, __event__ and __resource__ received:
 
 | Event     | Resource | Class                   |
 |-----------|----------|-------------------------|

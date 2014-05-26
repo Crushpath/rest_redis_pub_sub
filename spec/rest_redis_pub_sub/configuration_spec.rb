@@ -38,12 +38,16 @@ describe RestRedisPubSub::Configuration do
       expect(RestRedisPubSub.redis_instance).to eq(redis_instance)
     end
 
-    it "allows to set an app publisher" do
+    it "allows to set an app generator" do
       RestRedisPubSub.configure do |config|
-        config.publisher = 'my-app'
+        config.generator = 'my-app'
       end
 
-      expect(RestRedisPubSub.publisher).to eq('my-app')
+      expect(RestRedisPubSub.generator).to eq('my-app')
+    end
+
+    it "sets the provider" do
+      expect(RestRedisPubSub.provider).to eq("rest_redis_pub_sub #{RestRedisPubSub::VERSION}")
     end
   end
 
@@ -57,6 +61,7 @@ describe RestRedisPubSub::Configuration do
         config.publish_to = "my-publish-channel"
         config.redis_instance = redis_instance
         config.listeners_namespace = Listeners
+        config.verbs = [:create, :update]
       end
 
       RestRedisPubSub.reset!
@@ -65,6 +70,7 @@ describe RestRedisPubSub::Configuration do
       expect(RestRedisPubSub.publish_to).to be_nil
       expect(RestRedisPubSub.redis_instance).to be_nil
       expect(RestRedisPubSub.listeners_namespace).to be_nil
+      expect(RestRedisPubSub.verbs).to eq(RestRedisPubSub::Configuration::VERBS)
     end
   end
 
