@@ -12,41 +12,72 @@ module RestRedisPubSub
     def initialize(channel=nil)
       @channel = channel
     end
+    attr_reader :options
 
-    [:create, :update, :delete, :request].each do |method|
-      define_method("publish_#{method}".to_sym) do |resource, identifier, data={}|
-        publish(method, resource, identifier, data)
+    [:create, :update, :delete, :request].each do |verb|
+      define_method("publish_#{verb}".to_sym) do |options={}|
+        @options = options.merge(verb: verb)
+        publish
       end
     end
 
-    def channel(resource)
+    def channel
       @channel || RestRedisPubSub.publish_to || "#{RestRedisPubSub.generator}.#{resource}"
     end
 
     private
 
-    def publish(event, resource, identifier, data={})
+    def publish(options={})
       json_object = {
-        generator: generator_object,
-        provider: provider_object,
-        event: EVENT_MAPPER[event],
-        resource: resource,
-        id: identifier,
-        data: data
+        generator: generator,
+        provider: provider,
+        verb: verb,
+        actor: actor,
+        object: object,
+        target: target,
+        id: id
       }.to_json
 
       RestRedisPubSub.redis_instance.publish(
-        channel(resource),
+        channel,
         json_object
       )
     end
 
-    def generator_object
+    def generator
       { display_name: RestRedisPubSub.generator }
     end
 
-    def  provider_object
+    def provider
       { display_name: RestRedisPubSub.provider }
+    end
+
+    def actor
+      options.fetch(:actor)
+    end
+
+    def object
+      options.fetch(:object)
+    end
+
+    def verb
+      options.fetch(:verb, :post)
+    end
+
+    def id
+      options.fetch(:id, nil)
+    end
+
+    def target
+      options.fetch(:target, nil)
+    end
+
+    def published
+      options.fetch(:published, Time.now)
+    end
+
+    def resource
+      object.fetch(:object_type)
     end
 
   end
