@@ -12,14 +12,18 @@ module RestRedisPubSub
     end
 
     def initialize(options={})
-      @event = options['event']
-      @resource = options['resource']
-      @publisher = options['publisher']
-      @identifier = options['id']
-      @data = options['data']
+      @verb = options['verb']
+      @generator = options['generator']
+      @provider = options['provider']
+      @id = options['id']
+      @actor= options['actor']
+      @object = options['object']
+      @target = options['target']
+      @activity_type = options['activity_type']
     end
 
-    attr_reader :event, :resource, :publisher, :identifier, :data
+    attr_reader :verb, :generator, :provider, :id, :actor, :object,
+                :target, :activity_type
 
     def forward
       return if class_to_forward.nil?
@@ -27,15 +31,21 @@ module RestRedisPubSub
       if enqueue_forward?
         forward_in_background
       else
-        class_to_forward.perform(identifier, data)
+        options = {
+          actor: actor,
+          object: object,
+          target: target,
+          id: id
+        }
+        class_to_forward.perform(options)
       end
     end
 
     def class_to_forward
-      return unless publisher && resource && event
+      return unless activity_type
 
       @class_to_forward ||= begin
-        class_name_parts = [publisher, resource, event]
+        class_name_parts = [generator['display_name'], activity_type]
         if namespace = RestRedisPubSub.listeners_namespace
           class_name_parts.unshift(namespace, '::')
         end

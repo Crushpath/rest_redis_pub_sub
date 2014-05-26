@@ -26,35 +26,35 @@ describe RestRedisPubSub::EventHandler do
 
   describe "#class_to_forward" do
     it "should retrieve the proper class if exists" do
-      MyAppProductCreated = Class.new
+      MyAppProductCreate = Class.new
       handler = RestRedisPubSub::EventHandler.new(
-        'publisher' => 'my_app',
-        'event' => 'created',
-        'resource' => 'product'
+        'generator' => {'display_name' => 'my_app'},
+        'verb' => 'create',
+        'activity_type' => 'product_create'
       )
-      expect(handler.class_to_forward).to eq(MyAppProductCreated)
+      expect(handler.class_to_forward).to eq(MyAppProductCreate)
     end
 
     it "should return nil if class doesnt exists" do
       handler = RestRedisPubSub::EventHandler.new(
-        'publisher' => 'my_app',
-        'event' => 'updated',
-        'resource' => 'product'
+        'generator' => {'display_name' => 'my_app'},
+        'verb' => 'update',
+        'activity_type' => 'product_update'
       )
       expect(handler.class_to_forward).to be_nil
     end
 
     it "should consider listener_namespace if set" do
       MyListeners = Module.new
-      MyListeners::MyAppProductDeleted = Class.new
+      MyListeners::MyAppProductDelete = Class.new
 
       RestRedisPubSub.listeners_namespace = MyListeners
       handler = RestRedisPubSub::EventHandler.new(
-        'publisher' => 'my_app',
-        'event' => 'deleted',
-        'resource' => 'product'
+        'generator' => {'display_name' => 'my_app'},
+        'verb' => 'delete',
+        'activity_type' => 'product_delete'
       )
-      expect(handler.class_to_forward).to eq(MyListeners::MyAppProductDeleted)
+      expect(handler.class_to_forward).to eq(MyListeners::MyAppProductDelete)
     end
   end
 
