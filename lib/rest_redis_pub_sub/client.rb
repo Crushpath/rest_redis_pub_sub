@@ -20,14 +20,15 @@ module RestRedisPubSub
     end
 
     def channel(resource)
-      @channel || RestRedisPubSub.publish_to || "#{RestRedisPubSub.publisher}.#{resource}"
+      @channel || RestRedisPubSub.publish_to || "#{RestRedisPubSub.generator}.#{resource}"
     end
 
     private
 
     def publish(event, resource, identifier, data={})
       json_object = {
-        publisher: RestRedisPubSub.publisher,
+        generator: generator_object,
+        provider: provider_object,
         event: EVENT_MAPPER[event],
         resource: resource,
         id: identifier,
@@ -38,6 +39,14 @@ module RestRedisPubSub
         channel(resource),
         json_object
       )
+    end
+
+    def generator_object
+      { display_name: RestRedisPubSub.generator }
+    end
+
+    def  provider_object
+      { display_name: RestRedisPubSub.provider }
     end
 
   end

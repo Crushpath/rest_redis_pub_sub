@@ -38,12 +38,16 @@ describe RestRedisPubSub::Configuration do
       expect(RestRedisPubSub.redis_instance).to eq(redis_instance)
     end
 
-    it "allows to set an app publisher" do
+    it "allows to set an app generator" do
       RestRedisPubSub.configure do |config|
-        config.publisher = 'my-app'
+        config.generator = 'my-app'
       end
 
-      expect(RestRedisPubSub.publisher).to eq('my-app')
+      expect(RestRedisPubSub.generator).to eq('my-app')
+    end
+
+    it "sets the provider" do
+      expect(RestRedisPubSub.provider).to eq("rest_redis_pub_sub #{RestRedisPubSub::VERSION}")
     end
   end
 

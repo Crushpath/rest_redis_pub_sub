@@ -6,6 +6,7 @@ module RestRedisPubSub
 
     attr_accessor :subscribe_to, :publish_to, :generator,
                   :listeners_namespace, :redis_instance
+    attr_reader   :provider
 
     def reset!
       @subscribe_to = nil
@@ -13,6 +14,7 @@ module RestRedisPubSub
       @generator = nil
       @listeners_namespace = nil
       @redis_instance = nil
+      @provider = "rest_redis_pub_sub #{VERSION}"
     end
   end
 
