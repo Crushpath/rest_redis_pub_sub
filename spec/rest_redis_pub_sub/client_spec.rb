@@ -14,6 +14,7 @@ describe RestRedisPubSub::Client do
       object: {object_type: 'resource', display_name: 'resource-name'},
       target: nil,
       id: nil,
+      activity_type: nil,
     }
     @input_data = {
       actor: {display_name: :system},
@@ -24,6 +25,7 @@ describe RestRedisPubSub::Client do
   describe "#create" do
     it "publish a create event for the given resource" do
       @expected_data[:verb] = :create
+      @expected_data[:activity_type] = :resource_create
       json_message = @expected_data.to_json
       expect(@redis_instance).to receive(:publish).with('my-app-resource', json_message)
 

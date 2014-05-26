@@ -35,7 +35,8 @@ module RestRedisPubSub
         actor: actor,
         object: object,
         target: target,
-        id: id
+        id: id,
+        activity_type: activity_type
       }.to_json
 
       RestRedisPubSub.redis_instance.publish(
@@ -78,6 +79,10 @@ module RestRedisPubSub
 
     def resource
       object.fetch(:object_type)
+    end
+
+    def activity_type
+      [resource, verb].join('_')
     end
 
   end
