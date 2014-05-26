@@ -2,12 +2,6 @@ require 'json'
 
 module RestRedisPubSub
   class Client
-    EVENT_MAPPER = {
-      :request => :requested,
-      :create => :created,
-      :update => :updated,
-      :delete => :deleted
-    }
 
     def initialize(channel=nil)
       @channel = channel
