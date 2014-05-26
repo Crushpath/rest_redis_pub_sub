@@ -3,17 +3,19 @@ require 'json'
 module RestRedisPubSub
   class Client
 
+    def self.define_publish_methods
+      RestRedisPubSub.verbs.each do |verb|
+        define_method("publish_#{verb}".to_sym) do |options={}|
+          @options = options.merge(verb: verb)
+          publish
+        end
+      end
+    end
+
     def initialize(channel=nil)
       @channel = channel
     end
     attr_reader :options
-
-    [:create, :update, :delete, :request].each do |verb|
-      define_method("publish_#{verb}".to_sym) do |options={}|
-        @options = options.merge(verb: verb)
-        publish
-      end
-    end
 
     def channel
       @channel || RestRedisPubSub.publish_to || "#{RestRedisPubSub.generator}.#{resource}"

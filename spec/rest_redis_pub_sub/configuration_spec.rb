@@ -61,6 +61,7 @@ describe RestRedisPubSub::Configuration do
         config.publish_to = "my-publish-channel"
         config.redis_instance = redis_instance
         config.listeners_namespace = Listeners
+        config.verbs = [:create, :update]
       end
 
       RestRedisPubSub.reset!
@@ -69,6 +70,7 @@ describe RestRedisPubSub::Configuration do
       expect(RestRedisPubSub.publish_to).to be_nil
       expect(RestRedisPubSub.redis_instance).to be_nil
       expect(RestRedisPubSub.listeners_namespace).to be_nil
+      expect(RestRedisPubSub.verbs).to eq(RestRedisPubSub::Configuration::VERBS)
     end
   end
 

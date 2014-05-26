@@ -4,8 +4,11 @@ describe RestRedisPubSub::Client do
   before do
     @redis_instance = double('redis_instance')
     RestRedisPubSub.reset!
-    RestRedisPubSub.redis_instance = @redis_instance
-    RestRedisPubSub.generator = 'my-app'
+    RestRedisPubSub.configure do |config|
+      config.generator = 'my-app'
+      config.redis_instance = @redis_instance
+      config.verbs = [:create]
+    end
     @expected_data = {
       generator: {display_name: RestRedisPubSub.generator},
       provider: {display_name: "rest_redis_pub_sub #{RestRedisPubSub::VERSION}"},
