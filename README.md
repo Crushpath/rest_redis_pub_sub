@@ -63,32 +63,47 @@ It publish to the specified channel the following data in json format:
 ```json
 => {
   generator: {
-    application: 'my-app'
+    display_name: 'crushpath'
+  },
+  provider: {
+    display_name: 'rest_redis_pub_sub 0.3.1'
   }
-  event: 'created',
-  resource: 'spot',
+  verb: 'create',
   id: 'spot_id',
-  data: {}
+  actor: {
+    object_type: 'user',
+    ...
+  },
+  object: {
+    object_type: 'spot',
+    ...
+  },
+  target: {
+    object_type: 'etc'
+  }
 }
 ```
 
 Available publish events:
-* `publish_request`
-* `publish_create`
-* `publish_update`
-* `publish_delete`
+```
+[
+ :add, :call, :change, :comment, :complete, :confirm, :create,
+ :dismiss, :email_reply, :evolve, :label, :like, :locate,
+ :make_friend, :message, :open, :post, :promote, :publish, :read,
+ :receive, :reject, :remove, :request, :request_contact, :send,
+ :sign_in, :sign_out, :system, :thank, :unpublish, :update, :view
+]
+```
 
 ## Subscribe
 
 `RestRedisPubSub` will forward all messages received to a class base on the
 __generator__, __event__ and __resource__ received:
 
-| Event     | Resource | Class                   |
+| Verb      | Object   | Class                   |
 |-----------|----------|-------------------------|
-| requested | spot     | PublisherSpotRequested  |
-| created   | spot     | PublisherSpotCreated    |
-| updated   | product  | PublisherProductUpdated |
-| deleted   | user     | PublisherUserDeleted    |
+| create    | spot     | PublisherSpotCreate     |
+| update    | spot     | PublisherSpotUpdate     |
 
 The class must implement a class method `.perform`. If `Resque` is defined it will
 enqueue it.
@@ -96,7 +111,7 @@ enqueue it.
 An example class that should be defined in the project to handle the publish message:
 
 ```ruby
-class CrushpathSpotCreated
+class Listeners::CrushpathSpotCreate
 
   def self.perform(id, data)
     ...
