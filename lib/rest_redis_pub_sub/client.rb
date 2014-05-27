@@ -32,7 +32,8 @@ module RestRedisPubSub
         object: object,
         target: target,
         id: id,
-        activity_type: activity_type
+        activity_type: activity_type,
+        published: published
       }.to_json
 
       RestRedisPubSub.redis_instance.publish(
@@ -70,7 +71,8 @@ module RestRedisPubSub
     end
 
     def published
-      options.fetch(:published, Time.now)
+      published_at = options.fetch(:published, Time.now)
+      published_at.utc.strftime("%FT%RZ")
     end
 
     def resource
