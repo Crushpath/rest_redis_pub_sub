@@ -31,13 +31,7 @@ module RestRedisPubSub
       if enqueue_forward?
         forward_in_background
       else
-        options = {
-          actor: actor,
-          object: object,
-          target: target,
-          id: id
-        }
-        class_to_forward.perform(options)
+        class_to_forward.perform(activity)
       end
     end
 
@@ -59,7 +53,16 @@ module RestRedisPubSub
     end
 
     def forward_in_background
-      Resque.enqueue(class_to_forward, identifier, data)
+      Resque.enqueue(class_to_forward, activity)
+    end
+
+    def activity
+      {
+        actor: actor,
+        object: object,
+        target: target,
+        id: id
+      }
     end
 
   end
