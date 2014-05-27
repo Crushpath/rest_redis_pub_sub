@@ -18,6 +18,7 @@ describe RestRedisPubSub::Client do
       target: nil,
       id: nil,
       activity_type: nil,
+      published: Time.now.utc.strftime("%FT%RZ")
     }
     @input_data = {
       actor: {display_name: :system},
