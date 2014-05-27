@@ -35,7 +35,7 @@ end
 
 ## Running the worker
 
-Include `rest_redis_pub_sub/tasks` in you application:
+Include `rest_redis_pub_sub/tasks` in your application:
 ```
 require 'rest_redis_pub_sub/tasks'
 ```
