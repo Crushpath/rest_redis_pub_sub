@@ -50,7 +50,7 @@ bundle exec run rake rest_redis_pub_sub:subscribe
 
 Using default channel:
 ```ruby
-client = RestRedisPubSub::Client
+client = RestRedisPubSub::Client.new
 client.publish_create(resource, identifier, data)
 ```
 Or a custom one:
