@@ -13,7 +13,6 @@ module RestRedisPubSub
 
     attr_accessor :subscribe_to, :publish_to, :generator,
                   :listeners_namespace, :redis_instance
-    attr_reader   :provider
     attr_writer   :verbs
 
     def reset!
@@ -23,11 +22,14 @@ module RestRedisPubSub
       @listeners_namespace = nil
       @redis_instance = nil
       @verbs = nil
-      @provider = "rest_redis_pub_sub #{VERSION}"
     end
 
     def verbs
       @verbs || RestRedisPubSub::Configuration::VERBS
+    end
+
+    def provider
+      "rest_redis_pub_sub #{VERSION}"
     end
   end
 
