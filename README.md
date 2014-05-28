@@ -96,6 +96,34 @@ Available publish events:
 ]
 ```
 
+RestRedisPubSub provides a publisher class that can be inherit to create child classes:
+```
+class MyPublishers::SpotCreate < RestRedisPubSub::Publisher
+
+  def initialize(attrs={})
+  end
+
+  def verb
+    #required
+  end
+
+  def object
+    #required
+  end
+
+  def actor
+    #required
+  end
+
+  def target
+  end
+
+  def id
+  end
+
+end
+```
+
 ## Subscribe
 
 `RestRedisPubSub` will forward all messages received to a class base on the
