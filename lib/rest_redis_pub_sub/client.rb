@@ -34,11 +34,13 @@ module RestRedisPubSub
         id: id,
         activity_type: activity_type,
         published: published
-      }.to_json
+      }
+
+      json_object.merge!(extensions: extensions) if extensions
 
       RestRedisPubSub.redis_instance.publish(
         channel,
-        json_object
+        json_object.to_json
       )
     end
 
@@ -81,6 +83,10 @@ module RestRedisPubSub
 
     def activity_type
       [resource, verb].join('_')
+    end
+
+    def extensions
+      options.fetch(:extensions, nil)
     end
 
   end

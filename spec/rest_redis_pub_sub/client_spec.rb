@@ -38,6 +38,20 @@ describe RestRedisPubSub::Client do
     end
   end
 
+  describe "#extensions" do
+    it "should include extensions if defined" do
+      @expected_data[:verb] = :create
+      @expected_data[:activity_type] = :resource_create
+      @expected_data[:extensions] = {new_property: true}
+      json_message = @expected_data.to_json
+      expect(@redis_instance).to receive(:publish).with('my-app-resource', json_message)
+
+      @input_data[:extensions] = {new_property: true}
+      client = RestRedisPubSub::Client.new('my-app-resource')
+      client.publish_create(@input_data)
+    end
+  end
+
   describe "#channel" do
     it "prioritize custom channel" do
       client = RestRedisPubSub::Client.new('my-custom-channel')
