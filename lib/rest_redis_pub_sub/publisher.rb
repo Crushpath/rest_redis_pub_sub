@@ -16,7 +16,8 @@ module RestRedisPubSub
         actor: actor,
         object: object,
         target: target,
-        id: id
+        id: id,
+        extensions: extensions
       }
     end
 
@@ -36,6 +37,9 @@ module RestRedisPubSub
     end
 
     def id
+    end
+
+    def extensions
     end
 
     private

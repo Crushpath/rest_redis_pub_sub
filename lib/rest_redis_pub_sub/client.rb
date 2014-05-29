@@ -36,7 +36,7 @@ module RestRedisPubSub
         published: published
       }
 
-      json_object.merge!(extensions: extensions) if extensions
+      json_object.merge!(extensions) if extensions
 
       RestRedisPubSub.redis_instance.publish(
         channel,
@@ -86,7 +86,8 @@ module RestRedisPubSub
     end
 
     def extensions
-      options.fetch(:extensions, nil)
+      value = options.fetch(:extensions, nil)
+      value.is_a?(Hash) ? value : nil
     end
 
   end

@@ -42,7 +42,7 @@ describe RestRedisPubSub::Client do
     it "should include extensions if defined" do
       @expected_data[:verb] = :create
       @expected_data[:activity_type] = :resource_create
-      @expected_data[:extensions] = {new_property: true}
+      @expected_data[:new_property] = true
       json_message = @expected_data.to_json
       expect(@redis_instance).to receive(:publish).with('my-app-resource', json_message)
 
