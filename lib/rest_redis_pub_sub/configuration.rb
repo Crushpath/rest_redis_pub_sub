@@ -3,8 +3,9 @@ module RestRedisPubSub
     VERBS = [:add, :call, :change, :comment, :complete, :confirm, :create,
              :dismiss, :email_reply, :evolve, :label, :like, :locate,
              :make_friend, :message, :open, :post, :promote, :publish, :read,
-             :receive, :reject, :remove, :request, :request_contact, :send,
-             :sign_in, :sign_out, :system, :thank, :unpublish, :update, :view]
+             :receive, :reject, :remove, :request, :request_contact, :response,
+             :send, :sign_in, :sign_out, :system, :thank, :unpublish, :update,
+             :view]
 
     def configure(&block)
       block.call(self)
@@ -13,7 +14,7 @@ module RestRedisPubSub
 
     attr_accessor :subscribe_to, :publish_to, :generator,
                   :listeners_namespace, :redis_instance
-    attr_writer   :verbs
+    attr_writer   :verbs, :additional_verbs
 
     def reset!
       @subscribe_to = nil
@@ -22,10 +23,15 @@ module RestRedisPubSub
       @listeners_namespace = nil
       @redis_instance = nil
       @verbs = nil
+      @additional_verbs = nil
     end
 
     def verbs
-      @verbs || RestRedisPubSub::Configuration::VERBS
+      (@verbs || RestRedisPubSub::Configuration::VERBS) + additional_verbs
+    end
+
+    def additional_verbs
+      Array(@additional_verbs)
     end
 
     def provider

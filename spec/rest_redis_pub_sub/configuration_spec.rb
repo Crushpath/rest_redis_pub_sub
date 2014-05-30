@@ -49,10 +49,25 @@ describe RestRedisPubSub::Configuration do
     it "sets the provider" do
       expect(RestRedisPubSub.provider).to eq("rest_redis_pub_sub #{RestRedisPubSub::VERSION}")
     end
+
+    it "sets the defined verbs" do
+      RestRedisPubSub.configure do |config|
+        config.verbs = [:test]
+      end
+      expect(RestRedisPubSub.verbs).to eq([:test])
+    end
+
+    it "add the additional_verbs to the verbs list" do
+      RestRedisPubSub.configure do |config|
+        config.additional_verbs = [:test]
+      end
+      expect(RestRedisPubSub.additional_verbs).to eq([:test])
+      expect(RestRedisPubSub.verbs).to eq(RestRedisPubSub::Configuration::VERBS + [:test])
+    end
   end
 
   describe ".reset!" do
-    it "reset the configuratin values" do
+    it "reset the configuration values" do
       Listeners = Class.new
       MyRedis = Class.new
       redis_instance = MyRedis.new
@@ -62,6 +77,7 @@ describe RestRedisPubSub::Configuration do
         config.redis_instance = redis_instance
         config.listeners_namespace = Listeners
         config.verbs = [:create, :update]
+        config.additional_verbs = [:awesome]
       end
 
       RestRedisPubSub.reset!
@@ -71,6 +87,7 @@ describe RestRedisPubSub::Configuration do
       expect(RestRedisPubSub.redis_instance).to be_nil
       expect(RestRedisPubSub.listeners_namespace).to be_nil
       expect(RestRedisPubSub.verbs).to eq(RestRedisPubSub::Configuration::VERBS)
+      expect(RestRedisPubSub.additional_verbs).to eq([])
     end
   end
 
