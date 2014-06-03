@@ -2,8 +2,16 @@ module RestRedisPubSub
   class Publisher
 
     def self.publish(attrs={})
+      if attrs.delete(:enqueue) && background_handler_defined?
+        enqueue_publish!(attrs)
+        return true
+      end
       publisher = self.new(attrs)
       publisher.publish
+    end
+
+    def self.perform(attrs)
+      self.publish(parse_attrs(attrs))
     end
 
     def publish
@@ -43,6 +51,22 @@ module RestRedisPubSub
     end
 
     private
+
+    def self.background_handler_defined?
+      defined?(Resque)
+    end
+
+    def self.parse_attrs(attrs)
+      if defined?(HashWithIndifferentAccess)
+        HashWithIndifferentAccess.new(attrs)
+      else
+        attrs
+      end
+    end
+
+    def self.enqueue_publish!(attrs)
+      Resque.enqueue(self, attrs)
+    end
 
     def client
       RestRedisPubSub::Client.new

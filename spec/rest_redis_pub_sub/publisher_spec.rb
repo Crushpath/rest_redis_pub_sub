@@ -16,4 +16,21 @@ describe RestRedisPubSub::Publisher do
     expect{ @my_publisher.object }.to raise_error(NotImplementedError)
   end
 
+  describe ".publish" do
+    it "should call publish on the instance" do
+      my_publisher = double('MyPublisher')
+      MyPublisher.stub(:new).and_return(my_publisher)
+
+      expect(my_publisher).to receive(:publish)
+      MyPublisher.publish({})
+    end
+
+    it "should enqueue the publish if enqueue param is provided" do
+      MyPublisher.stub(:background_handler_defined?).and_return(true)
+      expect(MyPublisher).to receive(:enqueue_publish!).with({:property => 'awesome'})
+
+      MyPublisher.publish({:property => 'awesome', :enqueue => true})
+    end
+  end
+
 end
