@@ -31,6 +31,17 @@ describe RestRedisPubSub::Publisher do
 
       MyPublisher.publish({:property => 'awesome', :enqueue => true})
     end
+
+    it "should raise an error if job had non listeners" do
+      my_publisher = double('MyPublisher')
+      my_publisher.stub(:publish).and_return(0)
+      MyPublisher.stub(:new).and_return(my_publisher)
+      MyPublisher.stub(:background_handler_defined?).and_return(true)
+
+      expect {
+        MyPublisher.publish({property: 'great', raise_if_non_listeners: true})
+      }.to raise_error(RestRedisPubSub::NonListeners)
+    end
   end
 
 end
