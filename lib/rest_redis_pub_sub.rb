@@ -6,4 +6,5 @@ require "rest_redis_pub_sub/helper"
 require "rest_redis_pub_sub/version"
 
 module RestRedisPubSub
+  class NonListeners < StandardError;end
 end
