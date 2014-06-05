@@ -57,10 +57,10 @@ module RestRedisPubSub
     private
 
     def self.enqueue_if_non_listeners(attrs)
-      if attrs.delete('non_listeners')
+      if attrs.delete('raise_if_non_listeners')
         raise NonListeners.new("[#{self.to_s}] This event had non listeners.")
       else
-        enqueue_publish!(attrs.merge(non_listeners: true))
+        enqueue_publish!(attrs)
       end
     end
 
@@ -77,7 +77,7 @@ module RestRedisPubSub
     end
 
     def self.enqueue_publish!(attrs)
-      Resque.enqueue(self, attrs)
+      Resque.enqueue(self, attrs.merge(raise_if_non_listeners: true))
     end
 
     def client
