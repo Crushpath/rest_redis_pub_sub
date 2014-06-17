@@ -15,6 +15,8 @@ module RestRedisPubSub
 
     def self.perform(attrs)
       self.publish(parse_attrs(attrs))
+    rescue Resque::TermException
+      enqueue_publish!(attrs)
     end
 
     def publish
