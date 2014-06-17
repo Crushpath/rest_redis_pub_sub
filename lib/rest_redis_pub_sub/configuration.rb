@@ -37,6 +37,21 @@ module RestRedisPubSub
     def provider
       "rest_redis_pub_sub #{VERSION}"
     end
+
+    def register_signal_handlers
+      Signal.trap('TERM') { shutdown }
+      Signal.trap('INT')  { shutdown }
+      Signal.trap('QUIT') { shutdown }
+      Signal.trap('USR1') { shutdown }
+      Signal.trap('USR2') { shutdown }
+
+      puts "Registered signals"
+    end
+
+    def shutdown
+      puts "Exiting..."
+      exit
+    end
   end
 
   extend Configuration

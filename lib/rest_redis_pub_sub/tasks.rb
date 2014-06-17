@@ -5,6 +5,9 @@ namespace :rest_redis_pub_sub do
 
   desc "Start RestRedisPubSub subscribe worker."
   task :subscribe => [:preload, :setup] do
+
+    RestRedisPubSub.register_signal_handlers
+
     subscribed_channels = RestRedisPubSub.subscribe_to
 
     begin
