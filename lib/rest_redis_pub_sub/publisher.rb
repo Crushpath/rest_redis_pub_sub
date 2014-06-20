@@ -63,7 +63,7 @@ module RestRedisPubSub
 
     def self.enqueue_if_non_listeners(attrs)
       if attrs.delete(:raise_if_non_listeners) || attrs.delete('raise_if_non_listeners')
-        raise RestRedisPubSub::NonListeners.new("[#{self.to_s}] This event had non listeners.")
+        raise RestRedisPubSub::NoListeners.new("[#{self.to_s}] This event has no listeners.")
       else
         enqueue_publish!(attrs)
       end

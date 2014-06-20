@@ -32,7 +32,7 @@ describe RestRedisPubSub::Publisher do
       MyPublisher.publish({:property => 'awesome', :enqueue => true})
     end
 
-    it "should raise an error if job had non listeners" do
+    it "should raise an error if job has no listeners" do
       my_publisher = double('MyPublisher')
       my_publisher.stub(:publish).and_return(0)
       MyPublisher.stub(:new).and_return(my_publisher)
@@ -40,7 +40,7 @@ describe RestRedisPubSub::Publisher do
 
       expect {
         MyPublisher.publish({property: 'great', raise_if_non_listeners: true})
-      }.to raise_error(RestRedisPubSub::NonListeners)
+      }.to raise_error(RestRedisPubSub::NoListeners)
     end
   end
 
