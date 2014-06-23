@@ -9,7 +9,7 @@ module RestRedisPubSub
       publisher = self.new(attrs)
       listeners_count = publisher.publish
       if listeners_count.to_i <= 0 && background_handler_defined?
-        enqueue_if_non_listeners(attrs)
+        handle_if_no_listeners(attrs)
       end
     end
 
@@ -57,14 +57,18 @@ module RestRedisPubSub
 
     private
 
-    def self.raise_if_non_listeners
+    def self.raise_if_no_listeners
       true
     end
 
-    def self.enqueue_if_non_listeners(attrs)
-      if attrs.delete(:raise_if_non_listeners) || attrs.delete('raise_if_non_listeners')
+    def self.enqueue_if_no_listeners?
+      true
+    end
+
+    def self.handle_if_no_listeners(attrs)
+      if attrs.delete(:raise_if_no_listeners) || attrs.delete('raise_if_no_listeners')
         raise RestRedisPubSub::NoListeners.new("[#{self.to_s}] This event has no listeners.")
-      else
+      elsif enqueue_if_no_listeners?
         enqueue_publish!(attrs)
       end
     end
@@ -82,7 +86,7 @@ module RestRedisPubSub
     end
 
     def self.enqueue_publish!(attrs)
-      attrs_with_options = attrs.merge(raise_if_non_listeners: raise_if_non_listeners)
+      attrs_with_options = attrs.merge(raise_if_no_listeners: raise_if_no_listeners)
       Resque.enqueue(self, attrs_with_options)
     end
 

@@ -39,7 +39,7 @@ describe RestRedisPubSub::Publisher do
       MyPublisher.stub(:background_handler_defined?).and_return(true)
 
       expect {
-        MyPublisher.publish({property: 'great', raise_if_non_listeners: true})
+        MyPublisher.publish({property: 'great', raise_if_no_listeners: true})
       }.to raise_error(RestRedisPubSub::NoListeners)
     end
   end
