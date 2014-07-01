@@ -69,8 +69,16 @@ module RestRedisPubSub
       if attrs.delete(:raise_if_no_listeners) || attrs.delete('raise_if_no_listeners')
         raise RestRedisPubSub::NoListeners.new("[#{self.to_s}] This event has no listeners.")
       elsif enqueue_if_no_listeners?
-        enqueue_publish!(attrs)
+        if background_delay_defined?
+          enqueue_publish_with_delay(attrs)
+        else
+          enqueue_publish!(attrs)
+        end
       end
+    end
+
+    def self.background_delay_defined?
+      defined?(Resque::Scheduler)
     end
 
     def self.background_handler_defined?
@@ -88,6 +96,11 @@ module RestRedisPubSub
     def self.enqueue_publish!(attrs)
       attrs_with_options = attrs.merge(raise_if_no_listeners: raise_if_no_listeners)
       Resque.enqueue(self, attrs_with_options)
+    end
+
+    def self.enqueue_publish_with_delay(attrs)
+      attrs_with_options = attrs.merge(raise_if_no_listeners: raise_if_no_listeners)
+      Resque.enqueue_in(120, self, attrs_with_options)
     end
 
     def client
