@@ -42,6 +42,32 @@ describe RestRedisPubSub::Publisher do
         MyPublisher.publish({property: 'great', raise_if_no_listeners: true})
       }.to raise_error(RestRedisPubSub::NoListeners)
     end
+
+    it "should enqueue if job has no listeners" do
+      my_publisher = double('MyPublisher')
+      my_publisher.stub(:publish).and_return(0)
+      MyPublisher.stub(:new).and_return(my_publisher)
+      MyPublisher.stub(:background_handler_defined?).and_return(true)
+
+      attrs = {property: 'great', raise_if_no_listeners: false}
+      MyPublisher.should_receive(:enqueue_publish!).with(attrs)
+
+      MyPublisher.publish(attrs)
+    end
+
+    it "should enqueue with delay if job has no listeners" do
+      my_publisher = double('MyPublisher')
+      my_publisher.stub(:publish).and_return(0)
+      MyPublisher.stub(:new).and_return(my_publisher)
+      MyPublisher.stub(:background_handler_defined?).and_return(true)
+      MyPublisher.stub(:background_delay_defined?).and_return(true)
+
+      attrs = {property: 'great', raise_if_no_listeners: false}
+      MyPublisher.should_receive(:enqueue_publish_with_delay).with(attrs)
+
+      MyPublisher.publish(attrs)
+    end
+
   end
 
 end
