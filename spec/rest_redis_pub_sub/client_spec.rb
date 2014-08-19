@@ -16,6 +16,7 @@ describe RestRedisPubSub::Client do
       actor: {display_name: :system},
       object: {object_type: 'resource', display_name: 'resource-name'},
       target: nil,
+      source: nil,
       id: nil,
       activity_type: nil,
       published: Time.now.utc.strftime("%FT%RZ")

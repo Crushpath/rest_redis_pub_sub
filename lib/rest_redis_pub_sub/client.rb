@@ -31,6 +31,7 @@ module RestRedisPubSub
         actor: actor,
         object: object,
         target: target,
+        source: source,
         id: id,
         activity_type: activity_type,
         published: published
@@ -70,6 +71,10 @@ module RestRedisPubSub
 
     def target
       options.fetch(:target, nil)
+    end
+
+    def source
+      options.fetch(:source, nil)
     end
 
     def published

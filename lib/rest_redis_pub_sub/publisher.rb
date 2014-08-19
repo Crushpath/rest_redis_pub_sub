@@ -55,6 +55,9 @@ module RestRedisPubSub
     def extensions
     end
 
+    def source
+    end
+
     private
 
     def self.raise_if_no_listeners
