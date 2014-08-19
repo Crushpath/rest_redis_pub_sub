@@ -29,6 +29,7 @@ module RestRedisPubSub
         actor: actor,
         object: object,
         target: target,
+        spource: source,
         id: id,
         extensions: extensions
       }
