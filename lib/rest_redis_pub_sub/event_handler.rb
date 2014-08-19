@@ -20,10 +20,12 @@ module RestRedisPubSub
       @object = options['object']
       @target = options['target']
       @activity_type = options['activity_type']
+
+      @activity = options
     end
 
     attr_reader :verb, :generator, :provider, :id, :actor, :object,
-                :target, :activity_type
+                :target, :activity_type, :activity
 
     def forward
       return if class_to_forward.nil?
@@ -54,15 +56,6 @@ module RestRedisPubSub
 
     def forward_in_background
       Resque.enqueue(class_to_forward, activity)
-    end
-
-    def activity
-      {
-        actor: actor,
-        object: object,
-        target: target,
-        id: id
-      }
     end
 
   end
