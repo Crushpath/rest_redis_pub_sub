@@ -7,6 +7,7 @@ module RestRedisPubSub
         return true
       end
       publisher = self.new(attrs)
+      return true unless publisher.valid?
       listeners_count = publisher.publish
       if listeners_count.to_i <= 0 && background_handler_defined?
         handle_if_no_listeners(attrs)
@@ -57,6 +58,10 @@ module RestRedisPubSub
     end
 
     def source
+    end
+
+    def valid?
+      true
     end
 
     private

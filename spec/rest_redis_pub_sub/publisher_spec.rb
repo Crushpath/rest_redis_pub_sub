@@ -26,7 +26,7 @@ describe RestRedisPubSub::Publisher do
 
   describe ".publish" do
     it "should call publish on the instance" do
-      my_publisher = double('MyPublisher')
+      my_publisher = described_class.new
       MyPublisher.stub(:new).and_return(my_publisher)
 
       expect(my_publisher).to receive(:publish)
@@ -40,40 +40,54 @@ describe RestRedisPubSub::Publisher do
       MyPublisher.publish({:property => 'awesome', :enqueue => true})
     end
 
-    it "should raise an error if job has no listeners" do
-      my_publisher = double('MyPublisher')
-      my_publisher.stub(:publish).and_return(0)
-      MyPublisher.stub(:new).and_return(my_publisher)
-      MyPublisher.stub(:background_handler_defined?).and_return(true)
+    context "when no listeners" do
+      before do
+        my_publisher = described_class.new
+        my_publisher.stub(:publish).and_return(0)
+        MyPublisher.stub(:new).and_return(my_publisher)
+        MyPublisher.stub(:background_handler_defined?).and_return(true)
+      end
 
-      expect {
-        MyPublisher.publish({property: 'great', raise_if_no_listeners: true})
-      }.to raise_error(RestRedisPubSub::NoListeners)
+      it "should enqueue at first failure" do
+        attrs = {property: 'great', raise_if_no_listeners: false}
+        MyPublisher.should_receive(:enqueue_publish!).with(attrs)
+        MyPublisher.publish(attrs)
+      end
+
+      it "should enqueue with delay at second failure" do
+        MyPublisher.stub(:background_delay_defined?).and_return(true)
+
+        attrs = {property: 'great', raise_if_no_listeners: false}
+        MyPublisher.should_receive(:enqueue_publish_with_delay).with(attrs)
+
+        MyPublisher.publish(attrs)
+      end
+
+      it "should raise an error at third failure" do
+        expect {
+          MyPublisher.publish({property: 'great', raise_if_no_listeners: true})
+        }.to raise_error(RestRedisPubSub::NoListeners)
+      end
+
+    end
+  end
+
+  describe "#valid" do
+    before do
+      @my_publisher = described_class.new
+      MyPublisher.stub(:new).and_return(@my_publisher)
     end
 
-    it "should enqueue if job has no listeners" do
-      my_publisher = double('MyPublisher')
-      my_publisher.stub(:publish).and_return(0)
-      MyPublisher.stub(:new).and_return(my_publisher)
-      MyPublisher.stub(:background_handler_defined?).and_return(true)
-
-      attrs = {property: 'great', raise_if_no_listeners: false}
-      MyPublisher.should_receive(:enqueue_publish!).with(attrs)
-
-      MyPublisher.publish(attrs)
+    it 'should publish when publisher is valid' do
+      @my_publisher.stub(:valid?).and_return(true)
+      expect(@my_publisher).to receive(:publish)
+      MyPublisher.publish({})
     end
 
-    it "should enqueue with delay if job has no listeners" do
-      my_publisher = double('MyPublisher')
-      my_publisher.stub(:publish).and_return(0)
-      MyPublisher.stub(:new).and_return(my_publisher)
-      MyPublisher.stub(:background_handler_defined?).and_return(true)
-      MyPublisher.stub(:background_delay_defined?).and_return(true)
-
-      attrs = {property: 'great', raise_if_no_listeners: false}
-      MyPublisher.should_receive(:enqueue_publish_with_delay).with(attrs)
-
-      MyPublisher.publish(attrs)
+    it "should abort publish when publisher is not valid" do
+      @my_publisher.stub(:valid?).and_return(false)
+      expect(@my_publisher).to_not receive(:publish)
+      MyPublisher.publish({})
     end
 
   end
