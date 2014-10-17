@@ -16,6 +16,14 @@ describe RestRedisPubSub::Publisher do
     expect{ @my_publisher.object }.to raise_error(NotImplementedError)
   end
 
+  it "should not raise an error for optional fields" do
+    @my_publisher = MyPublisher.new
+    expect{ @my_publisher.id }.to_not raise_error(NotImplementedError)
+    expect{ @my_publisher.target }.to_not raise_error(NotImplementedError)
+    expect{ @my_publisher.source }.to_not raise_error(NotImplementedError)
+    expect{ @my_publisher.extensions }.to_not raise_error(NotImplementedError)
+  end
+
   describe ".publish" do
     it "should call publish on the instance" do
       my_publisher = double('MyPublisher')
