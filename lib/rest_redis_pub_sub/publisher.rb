@@ -87,11 +87,19 @@ module RestRedisPubSub
     end
 
     def self.background_delay_defined?
-      defined?(Resque::Scheduler)
+      (resque_defined? && defined?(Resque::Scheduler)) || sidekiq_defined?
     end
 
     def self.background_handler_defined?
+      resque_defined? || sidekiq_defined?
+    end
+
+    def self.resque_defined?
       defined?(Resque)
+    end
+
+    def self.sidekiq_defined?
+      defined?(Sidekiq)
     end
 
     def self.parse_attrs(attrs)
@@ -104,12 +112,20 @@ module RestRedisPubSub
 
     def self.enqueue_publish!(attrs)
       attrs_with_options = attrs.merge(raise_if_no_listeners: raise_if_no_listeners)
-      Resque.enqueue(self, attrs_with_options)
+      if resque_defined?
+        Resque.enqueue(self, attrs_with_options)
+      elsif sidekiq_defined?
+        self.perform_async(attrs_with_options)
+      end
     end
 
     def self.enqueue_publish_with_delay(attrs)
       attrs_with_options = attrs.merge(raise_if_no_listeners: raise_if_no_listeners)
-      Resque.enqueue_in(120, self, attrs_with_options)
+      if resque_defined?
+        Resque.enqueue_in(120, self, attrs_with_options)
+      elsif sidekiq_defined?
+        self.perform_in(120, attrs_with_options)
+      end
     end
 
     def client

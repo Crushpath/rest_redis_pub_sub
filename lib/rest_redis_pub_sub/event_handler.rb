@@ -51,11 +51,23 @@ module RestRedisPubSub
     end
 
     def enqueue_forward?
+      resque_defned?|| sidekiq_defined?
+    end
+
+    def resque_defned?
       defined?(Resque)
     end
 
+    def sidekiq_defined?
+      defined?(Sidekiq)
+    end
+
     def forward_in_background
-      Resque.enqueue(class_to_forward, activity)
+      if resque_defined?
+        Resque.enqueue(class_to_forward, activity)
+      elsif sidekiq_defined?
+        class_to_forward.perform_async(activity)
+      end
     end
 
   end
