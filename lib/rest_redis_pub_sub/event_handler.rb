@@ -51,10 +51,10 @@ module RestRedisPubSub
     end
 
     def enqueue_forward?
-      resque_defned?|| sidekiq_defined?
+      resque_defined?|| sidekiq_defined?
     end
 
-    def resque_defned?
+    def resque_defined?
       defined?(Resque)
     end
 
