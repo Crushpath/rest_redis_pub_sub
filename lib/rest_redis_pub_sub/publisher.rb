@@ -64,6 +64,10 @@ module RestRedisPubSub
       true
     end
 
+    def persist
+      false
+    end
+
     private
 
     def self.raise_if_no_listeners
@@ -129,7 +133,7 @@ module RestRedisPubSub
     end
 
     def client
-      RestRedisPubSub::Client.new
+      persist ? RestRedisPubSub::Client.new : RestRedisPubSub::PersistingClient.new
     end
 
     def not_implemented_error

@@ -30,6 +30,10 @@ RestRedisPubSub.configure do |config|
 
   # Set publish generator
   config.generator = 'my-app'
+  
+  # set the mongo session to persist to
+  config.mongoid_session_name =  'campaign_manager_activities'
+  
 end
 ```
 

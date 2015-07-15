@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rest_redis_pub_sub (0.3.17)
+    rest_redis_pub_sub (0.4.01)
 
 GEM
   remote: https://rubygems.org/

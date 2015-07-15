@@ -33,6 +33,19 @@ describe RestRedisPubSub::Publisher do
       MyPublisher.publish({})
     end
 
+
+    describe "persist", focus: true do
+      before do
+        @my_publisher = described_class.new
+        MyPublisher.stub(:new).and_return(@my_publisher)
+        @my_publisher.stub(:persist).and_return(true)
+      end
+      it "should publish" do
+        expect(@my_publisher).to receive(:publish)
+        MyPublisher.publish({})
+      end
+    end
+
     it "should enqueue the publish if enqueue param is provided" do
       MyPublisher.stub(:background_handler_defined?).and_return(true)
       expect(MyPublisher).to receive(:enqueue_publish!).with({:property => 'awesome'})

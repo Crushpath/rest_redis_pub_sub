@@ -21,29 +21,37 @@ module RestRedisPubSub
       @channel || RestRedisPubSub.publish_to || "#{RestRedisPubSub.generator}.#{resource}"
     end
 
-    private
+    protected
+
+    def json_object
+      unless @json_object
+        @json_object = {
+            generator: generator,
+            provider: provider,
+            verb: verb,
+            actor: actor,
+            object: object,
+            target: target,
+            source: source,
+            id: id,
+            activity_type: activity_type,
+            published: published
+        }
+
+        @json_object.merge!(extensions) if extensions
+      end
+
+      @json_object
+    end
 
     def publish(options={})
-      json_object = {
-        generator: generator,
-        provider: provider,
-        verb: verb,
-        actor: actor,
-        object: object,
-        target: target,
-        source: source,
-        id: id,
-        activity_type: activity_type,
-        published: published
-      }
-
-      json_object.merge!(extensions) if extensions
-
       RestRedisPubSub.redis_instance.publish(
-        channel,
-        json_object.to_json
+          channel,
+          json_object.to_json
       )
     end
+
+    private
 
     def generator
       { display_name: RestRedisPubSub.generator }
