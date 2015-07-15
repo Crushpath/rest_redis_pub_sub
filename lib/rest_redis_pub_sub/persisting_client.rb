@@ -7,7 +7,7 @@ module RestRedisPubSub
     protected
     def publish(options={})
       super(options)
-
+      publish_to_mongo
     end
 
     def publish_to_mongo
