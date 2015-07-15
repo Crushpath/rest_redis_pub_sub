@@ -8,8 +8,9 @@ module RestRedisPubSub
       end
       publisher = self.new(attrs)
       return true unless publisher.valid?
+
       listeners_count = publisher.publish
-      if listeners_count.to_i <= 0 && background_handler_defined?
+      if publisher.requires_listeners? && listeners_count.to_i <= 0 && background_handler_defined?
         handle_if_no_listeners(attrs)
       end
     end
@@ -22,6 +23,10 @@ module RestRedisPubSub
 
     def publish
       client.send("publish_#{verb}".to_sym, options)
+    end
+
+    def requires_listeners?
+      true
     end
 
     def options

@@ -10,6 +10,9 @@ module RestRedisPubSub
       publish_to_mongo
     end
 
+
+    private
+
     def publish_to_mongo
       begin
         setup_db
@@ -25,6 +28,7 @@ module RestRedisPubSub
         raise "No mongo session with name #{db_name}"
       end
     end
+
 
     def publish_activity
       activity = ActivityStreams::Activity.new(json_object)
