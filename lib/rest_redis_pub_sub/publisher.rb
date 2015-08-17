@@ -14,10 +14,16 @@ module RestRedisPubSub
       end
     end
 
+    # Invoked by Resque
     def self.perform(attrs)
       self.publish(parse_attrs(attrs))
     rescue Resque::TermException
       enqueue_publish!(attrs)
+    end
+
+    # Invoked by Sidekiq
+    def perform(attrs)
+      self.class.publish(parse_attrs(attrs))
     end
 
     def publish
@@ -108,6 +114,10 @@ module RestRedisPubSub
       else
         attrs
       end
+    end
+
+    def parse_attrs(attrs)
+      self.class.parse_attrs(attrs)
     end
 
     def self.enqueue_publish!(attrs)
